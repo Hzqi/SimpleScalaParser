@@ -1,4 +1,7 @@
 package com.jackywong.scala.parsing.my
+
+import com.jackywong.scala.parsing.my.Helpers.~
+
 /**
   * Created by huangziqi on 2019/7/1
   * 每一个Parser仅仅就是一个需要ParseState并且返回Result的函数而已
@@ -16,6 +19,8 @@ trait Parser[+A] {
   def map2[B,C](p2: => Parser[B])(f: (A,B) => C): Parser[C]
   def product[B](p2: => Parser[B]): Parser[(A,B)]
   def **[B](p2: => Parser[B]): Parser[(A, B)] = product(p2)
+  def productWith[B](p2: => Parser[B]): Parser[A~B]
+  def ~[B](p2: => Parser[B]): Parser[A~B] = productWith(p2)
   def as[B](b: B): Parser[B]
 
   //解析的逻辑运算，组合子

@@ -1,5 +1,6 @@
 package com.jackywong.scala.parsing.my.instances
 
+import com.jackywong.scala.parsing.my.Helpers.~
 import com.jackywong.scala.parsing.my._
 
 /**
@@ -43,6 +44,8 @@ case class AbstractParser[+A](execFunc: ParseState => ParseResult[A]) extends Pa
 
   override def product[B](p2: => Parser[B]): Parser[(A, B)] = flatMap(a => p2.map(b => (a,b)))
 
+  override def productWith[B](p2: => Parser[B]): Parser[~[A, B]] = flatMap(a => p2.map(b => new ~(a,b)))
+
   override def as[B](b: B): Parser[B] = slice.map(_ => b)
 
   override def and[B >: A](p2: => Parser[B]): Parser[B] = flatMap(_ => p2)
@@ -58,7 +61,13 @@ case class AbstractParser[+A](execFunc: ParseState => ParseResult[A]) extends Pa
 
   override def skipR(p2: => Parser[_]): Parser[A] = map2(p2.slice)((a,b) => a)
 
-  override def opt: Parser[Option[A]] = map(Some(_)) or AbstractParsers.succeed(None)
+  override def opt: Parser[Option[A]] = //map(Some(_)) or AbstractParsers.succeed(None)
+    AbstractParser(
+      s => exec(s) match {
+        case Success(get, length) => Success(Some(get),length)
+        case Failure(_, _) => Success(None,0)
+      }
+    )
 
   override def sep(p2: Parser[_]): Parser[List[A]] = sep1(p2) or AbstractParsers.succeed(List())
 

@@ -14,7 +14,7 @@ object AbstractParsers extends Parsers {
     s => Success(a,0)
   )
 
-  override def string(s: String): Parser[String] = AbstractParser{
+  override implicit def string(s: String): Parser[String] = AbstractParser{
     val msg = "'" + s + "'"
     state => {
       val i = ParserMethods.firstNonmatchingIndex(state.loc.input, s, state.loc.offset)
@@ -56,7 +56,7 @@ object AbstractParsers extends Parsers {
 
   override def many[A](p: Parser[A]): Parser[List[A]] = p.map2(many(p))(_ :: _) or succeed(List())
 
-  override def regex(r: Regex): Parser[String] = AbstractParser{
+  override implicit def regex(r: Regex): Parser[String] = AbstractParser{
     val msg = "regex " + r
     s => r.findPrefixOf(s.input) match {
       case None => Failure(s.loc.toError(msg), false)

@@ -141,7 +141,7 @@ object Arithmetic {
   四则运算的BNF表达式
   expr ::= term {addop term}*
   term ::= factor {mulop factor}*
-  factor ::= nat | paren expr
+  factor ::= nat | paren
   paren ::= '(' expr ')'
   addop ::= '+' | '-'
   mulop ::= '*' | '/'
